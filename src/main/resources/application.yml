@@ -1,0 +1,11 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: Weather-Forecast-API-App
+
+weatherbit:
+  base-url: https://api.weatherbit.io/v2.0/forecast/daily
+  api-key: ${WEATHERBIT_API_KEY}   # Add Later
+  timeout-ms: 5000
