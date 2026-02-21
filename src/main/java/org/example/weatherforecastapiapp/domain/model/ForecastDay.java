@@ -1,4 +1,4 @@
-package org.example.weatherforecastapiapp.external.weatherbit.dto;
+package org.example.weatherforecastapiapp.domain.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
