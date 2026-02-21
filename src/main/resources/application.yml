@@ -6,6 +6,6 @@ spring:
     name: Weather-Forecast-API-App
 
 weatherbit:
-  base-url: https://api.weatherbit.io/v2.0/forecast/daily
-  api-key: ${WEATHERBIT_API_KEY}   # Add Later
+  base-url: https://api.weatherbit.io/v2.0
+  api-key: ${WEATHERBIT_API_KEY}
   timeout-ms: 5000

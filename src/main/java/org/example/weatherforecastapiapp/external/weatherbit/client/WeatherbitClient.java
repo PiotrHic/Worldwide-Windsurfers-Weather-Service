@@ -11,17 +11,18 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.List;
 
-@Component
 public class WeatherbitClient {
 
     private final WebClient webClient;
     private final String apiKey;
+    private final Duration timeout;
 
-    public WeatherbitClient(String baseUrl, String apiKey) {
+    public WeatherbitClient(String baseUrl, String apiKey, int timeoutMs) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .build();
         this.apiKey = apiKey;
+        this.timeout = Duration.ofMillis(timeoutMs);
     }
 
     public List<ForecastDayDto> getDailyForecast(double lat, double lon) {
@@ -41,18 +42,18 @@ public class WeatherbitClient {
                             )
                     )
                     .bodyToMono(WeatherbitForecastResponse.class)
-                    .timeout(Duration.ofSeconds(5))
+                    .timeout(timeout)
                     .block();
 
             if (response == null || response.data() == null) {
                 throw new ExternalServiceException("Malformed Weatherbit response: data missing");
             }
 
-            for (ForecastDayDto day : response.data()) {
+            response.data().forEach(day -> {
                 if (day.validDate() == null) {
                     throw new ExternalServiceException("Malformed Weatherbit response: valid_date missing");
                 }
-            }
+            });
 
             return response.data();
         } catch (WebClientResponseException e) {
