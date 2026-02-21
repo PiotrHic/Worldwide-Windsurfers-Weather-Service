@@ -1,14 +1,22 @@
-# Use JDK 17 base image
-FROM eclipse-temurin:17-jdk-alpine
+# Używamy obrazu Maven + JDK 17 do builda
+FROM maven:3.9.3-eclipse-temurin-17 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar file
-COPY target/Weather-Forecast-API-App-0.0.1-SNAPSHOT.jar app.jar
+# Kopiujemy pliki Maven
+COPY pom.xml .
+COPY src ./src
 
-# Expose the port your app runs on
-EXPOSE 8070
+# Budujemy aplikację
+RUN mvn clean package -DskipTests
 
-# Run the app
+# Tworzymy finalny obraz z JDK
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Kopiujemy wygenerowany .jar z poprzedniego etapu
+COPY --from=build /app/target/Weather-Forecast-API-App-0.0.1-SNAPSHOT.jar app.jar
+
+# Uruchamiamy aplikację
 ENTRYPOINT ["java", "-jar", "app.jar"]
