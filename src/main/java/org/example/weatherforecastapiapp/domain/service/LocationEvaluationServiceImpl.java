@@ -7,6 +7,7 @@ import org.example.weatherforecastapiapp.domain.model.WindsurfingLocation;
 import org.example.weatherforecastapiapp.domain.repository.LocationRepository;
 import org.example.weatherforecastapiapp.external.weatherbit.client.WeatherbitClient;
 import org.example.weatherforecastapiapp.external.weatherbit.dto.ForecastDayDto;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -16,13 +17,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class LocationEvaluationServiceImpl {
 
     private final LocationRepository locationRepository;
     private final WeatherbitClient weatherbitClient;
 
     public LocationEvaluationServiceImpl(LocationRepository locationRepository,
-                                     WeatherbitClient weatherbitClient) {
+                                         WeatherbitClient weatherbitClient) {
         this.locationRepository = locationRepository;
         this.weatherbitClient = weatherbitClient;
     }
@@ -33,25 +35,25 @@ public class LocationEvaluationServiceImpl {
         try {
             date = LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            return new BestLocationResponse(
-                    null, null, null, null,
-                    "Invalid date format. Required yyyy-MM-dd."
-            );
+            throw new InvalidDateException("Invalid date format. Expected yyyy-MM-dd.");
         }
 
         LocalDate today = LocalDate.now();
         if (date.isBefore(today) || date.isAfter(today.plusDays(15))) {
-            return new BestLocationResponse(
-                    date, null, null, null,
-                    "Date must be within 16-day forecast range."
-            );
+            throw new DateOutOfRangeException("Date must be within 16-day forecast range.");
         }
 
         List<WindsurfingLocation> locations = locationRepository.findAll();
 
         List<ForecastDayWithLocation> forecastData = locations.stream()
                 .map(loc -> {
-                    List<ForecastDayDto> dtos = weatherbitClient.getDailyForecast(loc.latitude(), loc.longitude());
+                    List<ForecastDayDto> dtos;
+                    try {
+                        dtos = weatherbitClient.getDailyForecast(loc.latitude(), loc.longitude());
+                    } catch (Exception e) {
+                        throw new ExternalServiceException(
+                                "Unable to retrieve forecast data from Weatherbit.");
+                    }
 
                     Optional<ForecastDayDto> dayDtoOpt = dtos.stream()
                             .filter(d -> d.validDate().equals(date))
@@ -72,12 +74,14 @@ public class LocationEvaluationServiceImpl {
                 .toList();
 
         Optional<ForecastDayWithLocation> best = filtered.stream()
-                .max(Comparator.comparingDouble( fd -> fd.forecastDay().windSpeed()));
-
+                .max(Comparator.comparingDouble(fd -> fd.forecastDay().windSpeed()));
 
         if (best.isEmpty()) {
             return new BestLocationResponse(
-                    date, null, null, null,
+                    date,
+                    null,
+                    null,
+                    null,
                     "No suitable location found for given date"
             );
         }
@@ -92,8 +96,5 @@ public class LocationEvaluationServiceImpl {
         );
     }
 
-    private record ForecastDayWithLocation(
-            WindsurfingLocation location,
-            ForecastDay forecastDay
-    ) {}
+    private record ForecastDayWithLocation(WindsurfingLocation location, ForecastDay forecastDay) {}
 }
