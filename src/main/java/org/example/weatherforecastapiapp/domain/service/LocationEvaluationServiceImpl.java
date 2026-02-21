@@ -5,6 +5,9 @@ import org.example.weatherforecastapiapp.domain.mapper.ForecastDayMapper;
 import org.example.weatherforecastapiapp.domain.model.ForecastDay;
 import org.example.weatherforecastapiapp.domain.model.WindsurfingLocation;
 import org.example.weatherforecastapiapp.domain.repository.LocationRepository;
+import org.example.weatherforecastapiapp.exception.DateOutOfRangeException;
+import org.example.weatherforecastapiapp.exception.ExternalServiceException;
+import org.example.weatherforecastapiapp.exception.InvalidDateException;
 import org.example.weatherforecastapiapp.external.weatherbit.client.WeatherbitClient;
 import org.example.weatherforecastapiapp.external.weatherbit.dto.ForecastDayDto;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,7 @@ public class LocationEvaluationServiceImpl {
         try {
             date = LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            throw new InvalidDateException("Invalid date format. Expected yyyy-MM-dd.");
+            throw new InvalidDateException ("Invalid date format. Expected yyyy-MM-dd.");
         }
 
         LocalDate today = LocalDate.now();
