@@ -3,14 +3,15 @@ package org.example.weatherforecastapiapp.external.weatherbit.client;
 import org.example.weatherforecastapiapp.exception.ExternalServiceException;
 import org.example.weatherforecastapiapp.external.weatherbit.dto.ForecastDayDto;
 import org.example.weatherforecastapiapp.external.weatherbit.dto.WeatherbitForecastResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.List;
 
+@Component
 public class WeatherbitClient {
 
     private final WebClient webClient;

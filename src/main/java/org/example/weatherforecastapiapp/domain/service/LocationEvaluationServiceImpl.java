@@ -7,6 +7,7 @@ import org.example.weatherforecastapiapp.domain.model.WindsurfingLocation;
 import org.example.weatherforecastapiapp.domain.repository.LocationRepository;
 import org.example.weatherforecastapiapp.external.weatherbit.client.WeatherbitClient;
 import org.example.weatherforecastapiapp.external.weatherbit.dto.ForecastDayDto;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class LocationEvaluationServiceImpl {
 
     private final LocationRepository locationRepository;

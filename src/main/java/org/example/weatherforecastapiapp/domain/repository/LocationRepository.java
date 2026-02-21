@@ -1,9 +1,11 @@
 package org.example.weatherforecastapiapp.domain.repository;
 
 import org.example.weatherforecastapiapp.domain.model.WindsurfingLocation;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public class LocationRepository {
 
     private static final List<WindsurfingLocation> LOCATIONS = List.of(
