@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Best Location API
+  version: 1.0.0
+  description: API to get the best location based on a given date.
+servers:
+  - url: /api/v1
+paths:
+  /best-location:
+    get:
+      summary: Get the best location
+      description: Returns the best location for the provided date.
+      operationId: getBestLocation
+      parameters:
+        - name: date
+          in: query
+          description: Date in YYYY-MM-DD format
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BestLocationResponse'
+              examples:
+                sample:
+                  value:
+                    location: "Paris"
+                    score: 9.5
+        '400':
+          description: Invalid date or date out of range
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+              examples:
+                sample:
+                  value:
+                    timestamp: "2026-02-21T10:15:30Z"
+                    status: 400
+                    error: "Bad Request"
+                    message: "Date format is invalid."
+                    path: "/api/v1/best-location"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+              examples:
+                sample:
+                  value:
+                    timestamp: "2026-02-21T10:15:30Z"
+                    status: 500
+                    error: "Internal Server Error"
+                    message: "An unexpected error occurred."
+                    path: "/api/v1/best-location"
+components:
+  schemas:
+    BestLocationResponse:
+      type: object
+      properties:
+        location:
+          type: string
+          description: Name of the best evaluated location
+        score:
+          type: number
+          format: float
+          description: Location score
+      required:
+        - location
+        - score
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+    BadRequestError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
