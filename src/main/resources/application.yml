@@ -4,7 +4,7 @@ server:
     connection-timeout: 10000
   servlet:
     session:
-    timeout: 30s
+      timeout: 30s
 spring:
   application:
     name: Weather-Forecast-API-App
